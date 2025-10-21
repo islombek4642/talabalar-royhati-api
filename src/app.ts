@@ -14,7 +14,14 @@ import path from 'path';
 const app = express();
 
 app.use(cors());
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginEmbedderPolicy: false
+  })
+);
 app.use(express.json());
 
 app.get('/', (_req, res) => {
@@ -25,6 +32,10 @@ const openapiPath = path.resolve(process.cwd(), 'openapi.yaml');
 if (fs.existsSync(openapiPath)) {
   const file = fs.readFileSync(openapiPath, 'utf-8');
   const openapi = YAML.parse(file);
+  // Serve the raw spec for Swagger UI fetches if needed
+  app.get('/openapi.yaml', (_req, res) => {
+    res.type('text/yaml').send(file);
+  });
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapi));
 }
 
