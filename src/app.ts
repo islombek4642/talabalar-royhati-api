@@ -36,7 +36,16 @@ if (fs.existsSync(openapiPath)) {
   app.get('/openapi.yaml', (_req, res) => {
     res.type('text/yaml').send(file);
   });
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapi));
+  // Ensure no strict security headers interfere with Swagger assets
+  app.use('/api-docs', (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('X-Content-Security-Policy');
+    res.removeHeader('X-WebKit-CSP');
+    res.removeHeader('Cross-Origin-Opener-Policy');
+    res.removeHeader('Cross-Origin-Resource-Policy');
+    res.removeHeader('Cross-Origin-Embedder-Policy');
+    next();
+  }, swaggerUi.serve, swaggerUi.setup(openapi));
 }
 
 app.use('/health', healthRouter);
