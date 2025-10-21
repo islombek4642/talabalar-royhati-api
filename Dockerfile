@@ -7,6 +7,8 @@ RUN npm ci
 # --- Build stage ---
 FROM node:20-alpine AS builder
 WORKDIR /app
+# Prisma engines on Alpine require OpenSSL compatibility at build time for generate
+RUN apk add --no-cache openssl1.1-compat libc6-compat
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build && npx prisma generate
@@ -15,6 +17,8 @@ RUN npm run build && npx prisma generate
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# Install OpenSSL compatibility for Prisma engines at runtime
+RUN apk add --no-cache openssl1.1-compat libc6-compat
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY package*.json ./
