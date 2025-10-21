@@ -14,7 +14,7 @@ import path from 'path';
 const app = express();
 
 app.use(cors());
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 
 app.get('/', (_req, res) => {
