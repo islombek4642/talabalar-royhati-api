@@ -32,6 +32,8 @@ const openapiPath = path.resolve(process.cwd(), 'openapi.yaml');
 if (fs.existsSync(openapiPath)) {
   const file = fs.readFileSync(openapiPath, 'utf-8');
   const openapi = YAML.parse(file);
+  // Force same-origin so Swagger calls current host/protocol instead of localhost
+  (openapi as any).servers = [{ url: '/' }];
   // Serve the raw spec for Swagger UI fetches if needed
   app.get('/openapi.yaml', (_req, res) => {
     res.type('text/yaml').send(file);
