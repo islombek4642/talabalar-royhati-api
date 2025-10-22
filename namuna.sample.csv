@@ -1,3 +1,21 @@
 full_name,faculty,group,email,phone,birth_date,enrollment_year,status
 Ali Valiyev,Engineering,SE-21,ali@example.com,+998901234567,2003-05-17,2021,active
 Laylo Karimova,Math,MA-20,laylo@example.com,+998909998877,2002-09-01,2020,graduated
+Jasur Akbarov,Computer Science,CS-22,jasur@example.com,+998901112233,2004-01-12,2022,active
+Madina Rasulova,Information Technology,IT-23,madina@example.com,+998909001122,2005-03-05,2023,active
+Temur Bekmurodov,Engineering,SE-20,temur@example.com,+998933334455,2002-07-19,2020,graduated
+Nodira Yuldasheva,Economics,EC-21,nodira@example.com,+998935551122,2003-11-23,2021,active
+Aziz Shukurov,Physics,PH-19,aziz@example.com,+998977778899,2001-02-10,2019,graduated
+Dilnoza Karimova,Math,MA-22,dilnoza@example.com,+998935550011,2004-06-14,2022,active
+Shahzod Ismoilov,Biology,BI-21,shahzod@example.com,+998909876543,2003-09-02,2021,active
+Zilola Tursunova,Arts,AR-23,zilola@example.com,+998901234890,2005-12-30,2023,active
+Bekzod Usmonov,Law,LA-20,bekzod@example.com,+998936660000,2002-04-18,2020,graduated
+Malika Nurmatova,Medicine,MD-22,malika@example.com,+998939990001,2004-08-27,2022,active
+Otabek Rahmatov,Computer Science,CS-21,otabek@example.com,+998901112299,2003-10-11,2021,active
+Sevara Qodirova,Information Technology,IT-22,sevara@example.com,+998931234567,2004-05-21,2022,active
+Komil Abdullayev,Engineering,SE-19,komil@example.com,+998935554433,2001-03-01,2019,graduated
+Maftuna Alimova,Math,MA-21,maftuna@example.com,+998907700221,2003-09-29,2021,active
+Javlon Shermatov,Economics,EC-22,javlon@example.com,+998933210987,2004-01-31,2022,active
+Dilshod Xolmatov,Physics,PH-20,dilshod@example.com,+998935551199,2002-02-25,2020,graduated
+Sabina Ergasheva,Arts,AR-21,sabina@example.com,+998901100221,2003-07-07,2021,active
+Zafar Ganiev,Biology,BI-22,zafar@example.com,+998909009900,2004-11-15,2022,active
