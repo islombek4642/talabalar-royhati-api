@@ -9,6 +9,17 @@ jobs:
   ci:
     name: Build & Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +36,27 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
+      - name: Wait for Postgres
+        run: |
+          for i in {1..10}; do
+            if pg_isready -h localhost -p 5432 -U postgres; then echo "postgres ready"; exit 0; fi; sleep 2; done; exit 1
+
+      - name: Prepare Prisma client
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
+        run: npx prisma generate
+
+      - name: Run DB migrations (test)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
+        run: npx prisma migrate deploy || npx prisma db push
+
       - name: Test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb?schema=public
+          JWT_SECRET: test_secret
+          ADMIN_USERNAME: admin
+          ADMIN_PASSWORD: admin123
         run: npm test --if-present
         continue-on-error: true
 
