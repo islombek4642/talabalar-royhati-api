@@ -14,7 +14,7 @@ services:
         max-file: "3"
 
   api:
-    build: .
+    image: ghcr.io/islombek4642/talabalar-royhati-api:${IMAGE_TAG}
     depends_on:
       - db
     environment:

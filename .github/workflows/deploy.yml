@@ -87,13 +87,13 @@ jobs:
             git fetch --all --prune
             git reset --hard origin/main
 
-            # Optional: set env vars here, or use .env file
-            # export JWT_SECRET=${JWT_SECRET}
-
+            # Pull latest GHCR image and restart without building on server
+            # Use short commit SHA as IMAGE_TAG to match GHCR short tag
+            export IMAGE_TAG=$(git rev-parse --short HEAD)
             docker compose down || true
-            docker compose pull || true
-            docker compose build --no-cache
+            docker compose pull
             docker compose up -d
+            docker image prune -f || true
             docker compose ps
 
             echo "Deployed commit: $(git rev-parse --short HEAD)"
