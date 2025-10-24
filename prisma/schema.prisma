@@ -24,6 +24,25 @@ model Student {
   created_by      String?   // Audit: who created
   updated_by      String?   // Audit: who updated
   auditLogs       AuditLog[]
+  user            User?     // Student user account (for login)
+}
+
+model User {
+  id              String    @id @default(uuid())
+  student_id      String    @unique // Link to Student
+  email           String    @unique
+  password        String    // Hashed password (bcrypt)
+  role            Role      @default(STUDENT)
+  is_active       Boolean   @default(true)
+  email_verified  Boolean   @default(false)
+  last_login_at   DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  student         Student   @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  
+  @@index([email])
+  @@index([student_id])
 }
 
 model AuditLog {
@@ -45,4 +64,9 @@ enum Status {
   graduated
   expelled
   academic_leave
+}
+
+enum Role {
+  ADMIN
+  STUDENT
 }

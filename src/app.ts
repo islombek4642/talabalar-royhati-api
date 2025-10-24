@@ -11,6 +11,7 @@ import { conditionalSwaggerAuth } from './middlewares/swaggerAuth';
 import studentsRouter from './routes/students.route';
 import healthRouter from './routes/health.route';
 import authRouter from './routes/auth.route';
+import studentAuthRouter from './routes/student-auth.route';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yaml';
 import fs from 'fs';
@@ -71,6 +72,7 @@ if (env.ENABLE_METRICS) {
 
 app.use('/health', healthRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/student', studentAuthRouter);
 app.use('/api/v1/students', studentsRouter);
 
 app.use(errorHandler);
