@@ -5,6 +5,7 @@ Bu qo'llanma loyihani production muhitiga deploy qilish uchun to'liq yo'riqnoma.
 ## Talablar
 
 ### Server
+
 - Ubuntu 20.04+ yoki CentOS 7+
 - Minimum 2GB RAM
 - 20GB disk space
@@ -13,6 +14,7 @@ Bu qo'llanma loyihani production muhitiga deploy qilish uchun to'liq yo'riqnoma.
 - SSL certificate (Let's Encrypt tavsiya etiladi)
 
 ### Ports
+
 - 80 (HTTP)
 - 443 (HTTPS)
 - 22 (SSH)
@@ -80,7 +82,8 @@ BACKUP_DIR=/backups
 ENABLE_METRICS=true
 ```
 
-**MUHIM**: 
+**MUHIM**:
+
 - `STRONG_PASSWORD_HERE` o'rniga kuchli parollar kiriting
 - `GENERATE_STRONG_SECRET_HERE` uchun `openssl rand -hex 32` ishlatishingiz mumkin
 
@@ -190,7 +193,7 @@ server {
     # SSL certificates
     ssl_certificate /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/api.yourdomain.com/privkey.pem;
-    
+  
     # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
@@ -214,7 +217,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
-        
+      
         # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;

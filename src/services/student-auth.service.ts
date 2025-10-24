@@ -29,7 +29,7 @@ export const studentAuthService = {
     });
 
     if (existingUser) {
-      throw new Error('Email already registered');
+      throw new Error('Bu email allaqachon ro\'yhatdan o\'tgan');
     }
 
     // Hash password
@@ -97,14 +97,14 @@ export const studentAuthService = {
     });
 
     if (!user || !user.is_active) {
-      throw new Error('Invalid email or password');
+      throw new Error('Email yoki parol noto\'g\'ri');
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
+      throw new Error('Email yoki parol noto\'g\'ri');
     }
 
     // Update last login
