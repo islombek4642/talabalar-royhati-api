@@ -1,8 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import responseTime from 'response-time';
 import { env } from './config/env';
 import { errorHandler } from './middlewares/errorHandler';
+import { metricsMiddleware, metricsHandler } from './middlewares/metrics';
+import { requestTracingMiddleware } from './middlewares/requestTracing';
+import { apiLimiter } from './middlewares/rateLimiter';
+import { conditionalSwaggerAuth } from './middlewares/swaggerAuth';
 import studentsRouter from './routes/students.route';
 import healthRouter from './routes/health.route';
 import authRouter from './routes/auth.route';
@@ -13,6 +18,14 @@ import path from 'path';
 
 const app = express();
 
+// Monitoring & Performance
+if (env.ENABLE_METRICS) {
+  app.use(metricsMiddleware);
+}
+app.use(responseTime());
+app.use(requestTracingMiddleware);
+
+// Security
 app.use(cors());
 app.use(
   helmet({
@@ -22,6 +35,7 @@ app.use(
     crossOriginEmbedderPolicy: false
   })
 );
+app.use(apiLimiter); // Rate limiting
 app.use(express.json());
 
 app.get('/', (_req, res) => {
@@ -39,7 +53,7 @@ if (fs.existsSync(openapiPath)) {
     res.type('text/yaml').send(file);
   });
   // Ensure no strict security headers interfere with Swagger assets
-  app.use('/api-docs', (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
+  app.use('/api-docs', conditionalSwaggerAuth, (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
     res.removeHeader('Content-Security-Policy');
     res.removeHeader('X-Content-Security-Policy');
     res.removeHeader('X-WebKit-CSP');
@@ -48,6 +62,11 @@ if (fs.existsSync(openapiPath)) {
     res.removeHeader('Cross-Origin-Embedder-Policy');
     next();
   }, swaggerUi.serve, swaggerUi.setup(openapi));
+}
+
+// Metrics endpoint (if enabled)
+if (env.ENABLE_METRICS) {
+  app.get('/metrics', metricsHandler);
 }
 
 app.use('/health', healthRouter);

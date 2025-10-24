@@ -9,14 +9,44 @@ export const studentsRepo = {
   bulkCreate(rows: any[]) {
     return prisma.student.createMany({ data: rows, skipDuplicates: true });
   },
-  findById(id: string) {
-    return prisma.student.findUnique({ where: { id } });
+  findById(id: string, includeDeleted = false) {
+    return prisma.student.findFirst({ 
+      where: { 
+        id,
+        ...(includeDeleted ? {} : { deleted_at: null })
+      } 
+    });
   },
   update(id: string, data: any) {
     return prisma.student.update({ where: { id }, data });
   },
-  delete(id: string) {
+  // Soft delete
+  softDelete(id: string, deletedBy?: string) {
+    return prisma.student.update({ 
+      where: { id }, 
+      data: { 
+        deleted_at: new Date(),
+        updated_by: deletedBy
+      } 
+    });
+  },
+  // Hard delete (admin only)
+  hardDelete(id: string) {
     return prisma.student.delete({ where: { id } });
+  },
+  // Restore soft deleted
+  restore(id: string, restoredBy?: string) {
+    return prisma.student.update({ 
+      where: { id }, 
+      data: { 
+        deleted_at: null,
+        updated_by: restoredBy
+      } 
+    });
+  },
+  // Legacy delete method (now soft delete)
+  delete(id: string) {
+    return this.softDelete(id);
   },
   async listForExport(params: {
     sort?: string;
@@ -34,7 +64,7 @@ export const studentsRepo = {
         orderBy.push({ [field]: desc ? 'desc' : 'asc' });
       }
     }
-    const where: any = {};
+    const where: any = { deleted_at: null }; // Exclude deleted
     if (params.faculty) where.faculty = params.faculty;
     if (params.group) where.group = params.group;
     if (params.status) where.status = params.status;
@@ -65,7 +95,7 @@ export const studentsRepo = {
         orderBy.push({ [field]: desc ? 'desc' : 'asc' });
       }
     }
-    const where: any = {};
+    const where: any = { deleted_at: null }; // Exclude deleted
     if (params.faculty) where.faculty = params.faculty;
     if (params.group) where.group = params.group;
     if (params.status) where.status = params.status;
@@ -82,5 +112,14 @@ export const studentsRepo = {
     ]);
 
     return { total, data };
+  },
+  
+  // Get deleted students (admin only)
+  async getDeleted(limit = 50) {
+    return prisma.student.findMany({
+      where: { deleted_at: { not: null } },
+      orderBy: { deleted_at: 'desc' },
+      take: limit
+    });
   }
 };

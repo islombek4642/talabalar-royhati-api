@@ -4,7 +4,13 @@ import { studentsService } from '../services/students.service';
 export const studentsController = {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const created = await studentsService.create(req.body);
+      const userId = (req as any).user?.sub;
+      const created = await studentsService.create(
+        req.body,
+        userId,
+        req.ip,
+        req.get('user-agent')
+      );
       res.status(201).json(created);
     } catch (err) {
       next(err);
@@ -43,7 +49,14 @@ export const studentsController = {
   },
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const updated = await studentsService.update(req.params.id, req.body);
+      const userId = (req as any).user?.sub;
+      const updated = await studentsService.update(
+        req.params.id,
+        req.body,
+        userId,
+        req.ip,
+        req.get('user-agent')
+      );
       res.json(updated);
     } catch (err) {
       next(err);
@@ -51,7 +64,13 @@ export const studentsController = {
   },
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
-      await studentsService.delete(req.params.id);
+      const userId = (req as any).user?.sub;
+      await studentsService.delete(
+        req.params.id,
+        userId,
+        req.ip,
+        req.get('user-agent')
+      );
       res.status(204).send();
     } catch (err) {
       next(err);

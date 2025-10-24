@@ -8,17 +8,35 @@ datasource db {
 }
 
 model Student {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   full_name       String
   faculty         String
   group           String
-  email           String?  @unique
+  email           String?   @unique
   phone           String?
   birth_date      DateTime
   enrollment_year Int
-  status          Status   @default(active)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  status          Status    @default(active)
+  deleted_at      DateTime? // Soft delete
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  created_by      String?   // Audit: who created
+  updated_by      String?   // Audit: who updated
+  auditLogs       AuditLog[]
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entity_type String   // e.g., "Student"
+  entity_id   String   // ID of the entity
+  action      String   // "CREATE", "UPDATE", "DELETE"
+  user_id     String?  // Who performed the action
+  changes     Json?    // What changed (JSON object)
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+  
+  student     Student? @relation(fields: [entity_id], references: [id], onDelete: Cascade)
 }
 
 enum Status {

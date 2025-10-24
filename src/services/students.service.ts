@@ -1,25 +1,73 @@
 import { studentsRepo } from '../repositories/students.repo';
+import { auditService } from './audit.service';
 import { calcSkipTake } from '../utils/pagination';
 import { parse } from 'csv-parse/sync';
 import { createStudentSchema } from '../schemas/student.schema';
 
 export const studentsService = {
-  create(payload: any) {
-    return studentsRepo.create({
+  async create(payload: any, userId?: string, ipAddress?: string, userAgent?: string) {
+    const student = await studentsRepo.create({
       ...payload,
-      birth_date: new Date(payload.birth_date)
+      birth_date: new Date(payload.birth_date),
+      created_by: userId
     });
+    
+    // Audit log
+    await auditService.log({
+      entityType: 'Student',
+      entityId: student.id,
+      action: 'CREATE',
+      userId,
+      changes: payload,
+      ipAddress,
+      userAgent
+    });
+    
+    return student;
   },
   getById(id: string) {
     return studentsRepo.findById(id);
   },
-  update(id: string, payload: any) {
+  async update(id: string, payload: any, userId?: string, ipAddress?: string, userAgent?: string) {
     const data: any = { ...payload };
     if (data.birth_date) data.birth_date = new Date(data.birth_date);
-    return studentsRepo.update(id, data);
+    if (userId) data.updated_by = userId;
+    
+    const updated = await studentsRepo.update(id, data);
+    
+    // Audit log
+    await auditService.log({
+      entityType: 'Student',
+      entityId: id,
+      action: 'UPDATE',
+      userId,
+      changes: payload,
+      ipAddress,
+      userAgent
+    });
+    
+    return updated;
   },
-  delete(id: string) {
-    return studentsRepo.delete(id);
+  async delete(id: string, userId?: string, ipAddress?: string, userAgent?: string) {
+    const deleted = await studentsRepo.delete(id);
+    
+    // Audit log
+    await auditService.log({
+      entityType: 'Student',
+      entityId: id,
+      action: 'DELETE',
+      userId,
+      ipAddress,
+      userAgent
+    });
+    
+    return deleted;
+  },
+  async restore(id: string, userId?: string) {
+    return studentsRepo.restore(id, userId);
+  },
+  async getDeleted() {
+    return studentsRepo.getDeleted();
   },
   async list(query: any) {
     const { skip, take } = calcSkipTake(query.page, query.limit);

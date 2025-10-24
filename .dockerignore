@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+!.env.example
+dist
+.git
+.github
+.vscode
+*.md
+tests
+jest.config.ts
+.gitignore
+keypair.pem
+docker-compose*.yml

@@ -1,40 +1,44 @@
 services:
   db:
     image: postgres:15-alpine
+    container_name: talabalar_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: talabalar
+    ports:
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   api:
-    image: ghcr.io/islombek4642/talabalar-royhati-api:${IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: talabalar_api
+    ports:
+      - "3000:3000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@db:5432/talabalar?schema=public
-      JWT_SECRET: ${JWT_SECRET:-dev_secret}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_key_change_in_production}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      SWAGGER_USERNAME: ${SWAGGER_USERNAME:-swagger}
+      SWAGGER_PASSWORD: ${SWAGGER_PASSWORD:-swagger123}
+      BACKUP_DIR: ${BACKUP_DIR:-/backups}
+      ENABLE_METRICS: ${ENABLE_METRICS:-true}
     restart: unless-stopped
 
 volumes:

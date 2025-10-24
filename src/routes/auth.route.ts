@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { issueToken } from '../middlewares/auth';
+import { authLimiter } from '../middlewares/rateLimiter';
 import { env } from '../config/env';
 
 const router = Router();
 
-router.post('/login', (req, res) => {
+router.post('/login', authLimiter, (req, res) => {
   const { username, password } = req.body || {};
   const u = process.env.ADMIN_USERNAME || 'admin';
   const p = process.env.ADMIN_PASSWORD || 'admin123';

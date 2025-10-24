@@ -10,3 +10,6 @@ yarn-error.log*
 *.key
 *.ppk
 coverage/
+backups/
+logs/
+*.log
