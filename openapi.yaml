@@ -196,7 +196,9 @@ paths:
                   message: { type: string }
   /api/v1/auth/login:
     post:
-      summary: Login to obtain JWT token
+      summary: Admin login
+      tags:
+        - Admin Auth
       requestBody:
         required: true
         content:
@@ -217,6 +219,238 @@ paths:
                 properties:
                   access_token: { type: string }
                   token_type: { type: string, example: Bearer }
+  /api/v1/student/register:
+    post:
+      summary: Student registration
+      tags:
+        - Student Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [full_name, email, password, faculty, group, birth_date, enrollment_year]
+              properties:
+                full_name: { type: string, example: "Ali Valiyev" }
+                email: { type: string, format: email, example: "ali@example.com" }
+                password: { type: string, minLength: 6, example: "password123" }
+                faculty: { type: string, example: "IT" }
+                group: { type: string, example: "IT-21" }
+                birth_date: { type: string, format: date, example: "2003-01-15" }
+                enrollment_year: { type: integer, example: 2021 }
+                phone: { type: string, example: "+998901234567" }
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      email: { type: string }
+                      role: { type: string, example: "STUDENT" }
+                  student:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      full_name: { type: string }
+                      email: { type: string }
+                      faculty: { type: string }
+                      group: { type: string }
+                      profile_picture: { type: string, nullable: true }
+        '400':
+          description: Email already registered
+  /api/v1/student/login:
+    post:
+      summary: Student login
+      tags:
+        - Student Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, example: "ali@example.com" }
+                password: { type: string, example: "password123" }
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      email: { type: string }
+                      role: { type: string }
+                  student:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      full_name: { type: string }
+                      email: { type: string }
+                      faculty: { type: string }
+                      group: { type: string }
+                      status: { type: string }
+                      profile_picture: { type: string, nullable: true }
+        '401':
+          description: Invalid credentials
+  /api/v1/student/me:
+    get:
+      summary: Get student profile
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '401':
+          description: Unauthorized
+    patch:
+      summary: Update student profile
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name: { type: string }
+                phone: { type: string }
+                faculty: { type: string }
+                group: { type: string }
+                birth_date: { type: string, format: date }
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '401':
+          description: Unauthorized
+  /api/v1/student/change-password:
+    post:
+      summary: Change password
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password, confirm_password]
+              properties:
+                current_password: { type: string }
+                new_password: { type: string, minLength: 6 }
+                confirm_password: { type: string }
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        '400':
+          description: Current password is incorrect
+        '401':
+          description: Unauthorized
+  /api/v1/student/logout:
+    post:
+      summary: Student logout
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+  /api/v1/student/me/profile-picture:
+    post:
+      summary: Upload student profile picture
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                  format: binary
+              required: [picture]
+      responses:
+        '200':
+          description: Profile picture uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  profile_picture: { type: string }
+                  student:
+                    $ref: '#/components/schemas/Student'
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Delete student profile picture
+      tags:
+        - Student Auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile picture deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  student:
+                    $ref: '#/components/schemas/Student'
+        '401':
+          description: Unauthorized
+        '400':
+          description: Student has no profile picture
 components:
   schemas:
     Student:
