@@ -17,6 +17,7 @@ model Student {
   birth_date      DateTime
   enrollment_year Int
   status          Status    @default(active)
+  profile_picture String?   // Profile picture URL/path
   deleted_at      DateTime? // Soft delete
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt

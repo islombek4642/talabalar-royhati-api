@@ -42,7 +42,7 @@ export const publicLimiter = rateLimit({
 // Strict limiter for write operations
 export const writeLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 10, // 10 write operations per minute
+  max: process.env.NODE_ENV === 'development' ? 100 : 10, // 100 in dev, 10 in production
   message: {
     error: {
       message: 'Too many write operations, please slow down',

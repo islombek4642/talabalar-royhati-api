@@ -145,6 +145,55 @@ paths:
           schema: { type: string }
       responses:
         '204': { description: No Content }
+  /api/v1/students/{id}/profile-picture:
+    post:
+      summary: Upload profile picture
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                  format: binary
+              required: [picture]
+      responses:
+        '200':
+          description: Profile picture uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  profile_picture: { type: string }
+    delete:
+      summary: Delete profile picture
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Profile picture deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
   /api/v1/auth/login:
     post:
       summary: Login to obtain JWT token
@@ -182,6 +231,7 @@ components:
         birth_date: { type: string, format: date-time }
         enrollment_year: { type: integer }
         status: { type: string, enum: [active, graduated, expelled, academic_leave] }
+        profile_picture: { type: string, nullable: true }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     StudentCreate:
