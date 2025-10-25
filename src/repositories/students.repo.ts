@@ -7,7 +7,7 @@ export const studentsRepo = {
     return prisma.student.create({ data });
   },
   bulkCreate(rows: any[]) {
-    return prisma.student.createMany({ data: rows, skipDuplicates: true });
+    return prisma.student.createMany({ data: rows, skipDuplicates: false });
   },
   findById(id: string, includeDeleted = false) {
     return prisma.student.findFirst({ 
@@ -15,6 +15,19 @@ export const studentsRepo = {
         id,
         ...(includeDeleted ? {} : { deleted_at: null })
       } 
+    });
+  },
+  findByEmails(emails: string[]) {
+    return prisma.student.findMany({
+      where: {
+        email: { in: emails },
+        deleted_at: null
+      },
+      select: {
+        id: true,
+        email: true,
+        full_name: true
+      }
     });
   },
   update(id: string, data: any) {

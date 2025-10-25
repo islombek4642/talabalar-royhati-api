@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Edit, Trash2, UserPlus, Download } from 'lucide-react';
+import { Search, Edit, Trash2, UserPlus, Download, Upload } from 'lucide-react';
 import EditStudentModal from './components/EditStudentModal';
+import ImportModal from './components/ImportModal';
 
 interface Student {
-  id: number;
+  id: string;
   full_name: string;
   email: string;
   phone?: string;
@@ -22,6 +23,7 @@ export default function StudentsListPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFaculty, setFilterFaculty] = useState('');
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     fetchStudents();
@@ -30,7 +32,7 @@ export default function StudentsListPage() {
   const fetchStudents = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch('http://localhost:3000/api/v1/students?limit=100', {
+      const response = await fetch('http://localhost:3000/api/v1/students?limit=10000', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -44,7 +46,7 @@ export default function StudentsListPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Bu talabani o\'chirmoqchimisiz?')) return;
 
     try {
@@ -112,9 +114,10 @@ export default function StudentsListPage() {
         <p className="text-gray-600">Jami {students.length} ta talaba</p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Filters & Actions */}
+      <div className="bg-white rounded-lg shadow p-4 mb-6 space-y-4">
+        {/* First Row - Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -138,6 +141,18 @@ export default function StudentsListPage() {
               <option key={faculty} value={faculty}>{faculty}</option>
             ))}
           </select>
+        </div>
+
+        {/* Second Row - Actions */}
+        <div className="flex gap-4">
+          {/* Import Button */}
+          <button 
+            onClick={() => setShowImportModal(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <Upload className="w-5 h-5" />
+            Import CSV
+          </button>
 
           {/* Export Button */}
           <button 
@@ -240,6 +255,17 @@ export default function StudentsListPage() {
           onUpdate={() => {
             fetchStudents();
             setEditingStudent(null);
+          }}
+        />
+      )}
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <ImportModal
+          onClose={() => setShowImportModal(false)}
+          onSuccess={() => {
+            fetchStudents();
+            // Don't close modal here - let modal handle its own closing
           }}
         />
       )}

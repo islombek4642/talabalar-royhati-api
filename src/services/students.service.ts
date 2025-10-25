@@ -124,6 +124,8 @@ export const studentsService = {
     }) as any[];
     const valid: any[] = [];
     const errors: Array<{ row: number; message: string }> = [];
+    const emailsToCheck: string[] = [];
+    
     records.forEach((row, idx) => {
       // Normalize keys if needed
       const input = {
@@ -148,13 +150,65 @@ export const studentsService = {
           ...data,
           birth_date: new Date(data.birth_date)
         });
+        if (data.email) {
+          emailsToCheck.push(data.email);
+        }
       }
     });
+    
+    // Check for existing students by email
+    const duplicates: any[] = [];
+    if (emailsToCheck.length > 0) {
+      const existing = await studentsRepo.findByEmails(emailsToCheck);
+      const existingEmails = new Set(existing.map((s: any) => s.email).filter(Boolean));
+      
+      // Separate duplicates and new students
+      // Only check duplicates for students with email
+      const toInsert = valid.filter(s => !s.email || !existingEmails.has(s.email));
+      const duplicateStudents = valid.filter(s => s.email && existingEmails.has(s.email));
+      
+      duplicateStudents.forEach(s => {
+        duplicates.push({
+          email: s.email,
+          full_name: s.full_name
+        });
+      });
+      
+      // Insert only new students
+      let inserted = 0;
+      if (toInsert.length) {
+        console.log(`[Import] Attempting to insert ${toInsert.length} new students`);
+        console.log('[Import] Sample data:', toInsert[0]);
+        try {
+          const result = await studentsRepo.bulkCreate(toInsert);
+          console.log(`[Import] Raw insert result:`, JSON.stringify(result));
+          inserted = result?.count ?? toInsert.length;
+          console.log(`[Import] Calculated inserted count: ${inserted}`);
+        } catch (error) {
+          console.error('[Import] Insert error:', error);
+          console.error('[Import] Error details:', JSON.stringify(error));
+        }
+      } else {
+        console.log('[Import] No new students to insert (all duplicates)');
+      }
+      
+      return { 
+        inserted, 
+        invalid: errors.length, 
+        duplicates: duplicates.length,
+        duplicateList: duplicates,
+        errors 
+      };
+    }
+    
+    // Fallback if no emails to check
     let inserted = 0;
     if (valid.length) {
+      console.log(`[Import] No email check, inserting ${valid.length} students`);
       const result = await studentsRepo.bulkCreate(valid);
       inserted = (result as any).count ?? 0;
+      console.log(`[Import] Inserted count: ${inserted}`);
     }
-    return { inserted, invalid: errors.length, errors };
+    return { inserted, invalid: errors.length, duplicates: 0, duplicateList: [], errors };
   }
 };

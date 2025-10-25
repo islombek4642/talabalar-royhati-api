@@ -20,7 +20,7 @@ export default function StatisticsPage() {
   const fetchStatistics = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch('http://localhost:3000/api/v1/students?limit=100', {
+      const response = await fetch('http://localhost:3000/api/v1/students?limit=10000', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

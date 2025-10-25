@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface Student {
-  id: number;
+  id: string;
   full_name: string;
   email: string;
   phone?: string;

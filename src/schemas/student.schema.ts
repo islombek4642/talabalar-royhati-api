@@ -17,7 +17,7 @@ export const updateStudentSchema = createStudentSchema.partial();
 
 export const getStudentsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(500).default(10),
+  limit: z.coerce.number().int().min(1).max(10000).default(10),
   sort: z.string().optional(),
   faculty: z.string().optional(),
   group: z.string().optional(),
