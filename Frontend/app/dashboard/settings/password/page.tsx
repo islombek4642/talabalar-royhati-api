@@ -51,7 +51,7 @@ export default function PasswordChangePage() {
 
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
-      router.push('/login');
+      router.push('/');
     }
   }, [isInitialized, isAuthenticated, router]);
 
@@ -158,13 +158,15 @@ export default function PasswordChangePage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Current Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 mb-2">
                 Joriy Parol
               </label>
               <div className="relative">
                 <input
                   {...register('current_password')}
+                  id="current_password"
                   type={showCurrentPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="Joriy parolingizni kiriting"
                 />
@@ -187,13 +189,15 @@ export default function PasswordChangePage() {
 
             {/* New Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="new_password" className="block text-sm font-medium text-gray-700 mb-2">
                 Yangi Parol
               </label>
               <div className="relative">
                 <input
                   {...register('new_password')}
+                  id="new_password"
                   type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="Yangi parol kiriting"
                 />
@@ -237,13 +241,15 @@ export default function PasswordChangePage() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Parolni Tasdiqlang
+              <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700 mb-2">
+                Parolni Tasdiqlash
               </label>
               <div className="relative">
                 <input
                   {...register('confirm_password')}
+                  id="confirm_password"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="Yangi parolni qaytadan kiriting"
                 />

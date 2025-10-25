@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, ArrowLeft } from 'lucide-react';
 
 const registerSchema = z.object({
   full_name: z.string().min(2, 'Ism kamida 2 ta harf bo\'lishi kerak'),
@@ -90,8 +90,20 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+        {/* Back to Home Button */}
+        <div className="flex justify-between items-center">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Bosh sahifa
+          </Link>
+          <GraduationCap className="w-8 h-8 text-indigo-600" />
+        </div>
+
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Ro'yhatdan O'tish
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -113,7 +125,9 @@ export default function RegisterPage() {
               </label>
               <input
                 {...register('full_name')}
+                id="full_name"
                 type="text"
+                autoComplete="name"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Ali Valiyev"
               />
@@ -128,7 +142,9 @@ export default function RegisterPage() {
               </label>
               <input
                 {...register('email')}
+                id="email"
                 type="email"
+                autoComplete="email"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="ali@example.com"
               />
@@ -144,7 +160,9 @@ export default function RegisterPage() {
               <div className="relative">
                 <input
                   {...register('password')}
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="••••••••"
                 />
@@ -172,7 +190,9 @@ export default function RegisterPage() {
               <div className="relative">
                 <input
                   {...register('confirmPassword')}
+                  id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="••••••••"
                 />
@@ -200,7 +220,9 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register('faculty')}
+                  id="faculty"
                   type="text"
+                  autoComplete="organization"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="IT"
                 />
@@ -215,7 +237,9 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register('group')}
+                  id="group"
                   type="text"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="IT-21"
                 />
@@ -232,7 +256,9 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register('birth_date')}
+                  id="birth_date"
                   type="date"
+                  autoComplete="bday"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
                 {errors.birth_date && (
@@ -246,7 +272,9 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register('enrollment_year', { valueAsNumber: true })}
+                  id="enrollment_year"
                   type="number"
+                  autoComplete="off"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="2021"
                 />
@@ -262,7 +290,9 @@ export default function RegisterPage() {
               </label>
               <input
                 {...register('phone')}
+                id="phone"
                 type="tel"
+                autoComplete="tel"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="+998901234567"
               />

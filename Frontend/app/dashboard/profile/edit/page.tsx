@@ -43,7 +43,7 @@ export default function ProfileEditPage() {
 
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
-      router.push('/login');
+      router.push('/');
     }
   }, [isInitialized, isAuthenticated, router]);
 
@@ -149,12 +149,14 @@ export default function ProfileEditPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
                 To'liq Ism
               </label>
               <input
                 {...register('full_name')}
+                id="full_name"
                 type="text"
+                autoComplete="name"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Ali Valiyev"
               />
@@ -165,12 +167,14 @@ export default function ProfileEditPage() {
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Telefon Raqam
               </label>
               <input
                 {...register('phone')}
+                id="phone"
                 type="tel"
+                autoComplete="tel"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="+998901234567"
               />
@@ -182,12 +186,14 @@ export default function ProfileEditPage() {
             {/* Faculty & Group */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="faculty" className="block text-sm font-medium text-gray-700 mb-2">
                   Fakultet
                 </label>
                 <input
                   {...register('faculty')}
+                  id="faculty"
                   type="text"
+                  autoComplete="organization"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="IT"
                 />
@@ -197,12 +203,14 @@ export default function ProfileEditPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="group" className="block text-sm font-medium text-gray-700 mb-2">
                   Guruh
                 </label>
                 <input
                   {...register('group')}
+                  id="group"
                   type="text"
+                  autoComplete="off"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="IT-21"
                 />
@@ -214,12 +222,14 @@ export default function ProfileEditPage() {
 
             {/* Birth Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700 mb-2">
                 Tug'ilgan Sana
               </label>
               <input
                 {...register('birth_date')}
+                id="birth_date"
                 type="date"
+                autoComplete="bday"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
               {errors.birth_date && (
@@ -229,12 +239,14 @@ export default function ProfileEditPage() {
 
             {/* Enrollment Year */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="enrollment_year" className="block text-sm font-medium text-gray-700 mb-2">
                 O'qishga Kirgan Yil
               </label>
               <input
                 {...register('enrollment_year', { valueAsNumber: true })}
+                id="enrollment_year"
                 type="number"
+                autoComplete="off"
                 min="2000"
                 max={new Date().getFullYear() + 1}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"

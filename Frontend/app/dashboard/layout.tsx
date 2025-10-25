@@ -33,7 +33,7 @@ export default function DashboardLayout({
   // Redirect if not authenticated (but only after initialization)
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
-      router.push('/login');
+      router.push('/');
     }
   }, [isInitialized, isAuthenticated, router]);
 
@@ -58,7 +58,7 @@ export default function DashboardLayout({
   const handleLogout = () => {
     if (confirm('Tizimdan chiqmoqchimisiz?')) {
       logout();
-      router.push('/login');
+      router.push('/');
     }
   };
 
@@ -136,7 +136,6 @@ export default function DashboardLayout({
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                   ${isActive
@@ -169,16 +168,16 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      {/* Overlay (mobile) */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
       {/* Main Content */}
-      <main className="lg:ml-64">
+      <main className="lg:ml-64 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative">
+        {/* Transparent overlay when sidebar is open (mobile) */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-30 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close sidebar"
+          />
+        )}
         {children}
       </main>
     </div>

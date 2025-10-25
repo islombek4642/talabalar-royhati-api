@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, ArrowLeft } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Noto\'g\'ri email format'),
@@ -77,8 +77,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+        {/* Back to Home Button */}
+        <div className="flex justify-between items-center">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Bosh sahifa
+          </Link>
+          <GraduationCap className="w-8 h-8 text-indigo-600" />
+        </div>
+
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Tizimga Kirish
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -100,6 +112,7 @@ export default function LoginPage() {
               </label>
               <input
                 {...register('email')}
+                id="email"
                 type="email"
                 autoComplete="email"
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -117,6 +130,7 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   {...register('password')}
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   className="mt-1 appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
