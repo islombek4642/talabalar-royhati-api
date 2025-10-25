@@ -80,9 +80,15 @@ export const studentAuthService = {
         id: result.student.id,
         full_name: result.student.full_name,
         email: result.student.email,
+        phone: result.student.phone,
         faculty: result.student.faculty,
         group: result.student.group,
+        birth_date: result.student.birth_date,
+        enrollment_year: result.student.enrollment_year,
+        status: result.student.status,
         profile_picture: result.student.profile_picture,
+        created_at: result.student.created_at,
+        updated_at: result.student.updated_at,
       }
     };
   },
@@ -127,10 +133,15 @@ export const studentAuthService = {
         id: user.student.id,
         full_name: user.student.full_name,
         email: user.student.email,
+        phone: user.student.phone,
         faculty: user.student.faculty,
         group: user.student.group,
-        profile_picture: user.student.profile_picture,
+        birth_date: user.student.birth_date,
+        enrollment_year: user.student.enrollment_year,
         status: user.student.status,
+        profile_picture: user.student.profile_picture,
+        created_at: user.student.created_at,
+        updated_at: user.student.updated_at,
       }
     };
   },
@@ -181,11 +192,25 @@ export const studentAuthService = {
         faculty: data.faculty,
         group: data.group,
         birth_date: data.birth_date ? new Date(data.birth_date) : undefined,
+        enrollment_year: data.enrollment_year,
         updated_by: user.id,
       }
     });
 
-    return updated;
+    return {
+      id: updated.id,
+      full_name: updated.full_name,
+      email: updated.email,
+      phone: updated.phone,
+      faculty: updated.faculty,
+      group: updated.group,
+      birth_date: updated.birth_date,
+      enrollment_year: updated.enrollment_year,
+      status: updated.status,
+      profile_picture: updated.profile_picture,
+      created_at: updated.created_at,
+      updated_at: updated.updated_at,
+    };
   },
 
   async changePassword(userId: string, currentPassword: string, newPassword: string) {

@@ -8,6 +8,7 @@ interface AuthState {
   student: Student | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean; // New: tracks if storage has been loaded
   error: string | null;
   
   // Actions
@@ -15,6 +16,7 @@ interface AuthState {
   login: (data: LoginData) => Promise<void>;
   logout: () => void;
   loadFromStorage: () => void;
+  updateStudent: (student: Student) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   student: null,
   isAuthenticated: false,
   isLoading: false,
+  isInitialized: false,
   error: null,
 
   register: async (data: RegisterData) => {
@@ -30,6 +33,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true, error: null });
       const response = await api.post<AuthResponse>('/api/v1/student/register', data);
       const { token, user, student } = response.data;
+      
+      console.log('Register Response:', { token, user, student });
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify({ user, student }));
@@ -55,6 +60,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true, error: null });
       const response = await api.post<AuthResponse>('/api/v1/student/login', data);
       const { token, user, student } = response.data;
+      
+      console.log('Login Response:', { token, user, student });
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify({ user, student }));
@@ -92,14 +99,32 @@ export const useAuthStore = create<AuthState>((set) => ({
       const userData = localStorage.getItem('user');
       
       if (token && userData) {
-        const { user, student } = JSON.parse(userData);
-        set({
-          token,
-          user,
-          student,
-          isAuthenticated: true,
-        });
+        try {
+          const { user, student } = JSON.parse(userData);
+          set({
+            token,
+            user,
+            student,
+            isAuthenticated: true,
+            isInitialized: true,
+          });
+        } catch (error) {
+          console.error('Failed to parse user data:', error);
+          set({ isInitialized: true });
+        }
+      } else {
+        set({ isInitialized: true });
       }
     }
+  },
+
+  updateStudent: (student: Student) => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      parsed.student = student;
+      localStorage.setItem('user', JSON.stringify(parsed));
+    }
+    set({ student });
   },
 }));

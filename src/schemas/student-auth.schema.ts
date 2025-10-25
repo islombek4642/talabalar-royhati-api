@@ -22,6 +22,7 @@ export const updateProfileSchema = z.object({
   faculty: z.string().min(2).optional(),
   group: z.string().min(1).optional(),
   birth_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  enrollment_year: z.number().int().min(2000).max(new Date().getFullYear() + 1).optional(),
 });
 
 export const changePasswordSchema = z.object({

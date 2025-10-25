@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@db:5432/talabalar?schema=public
       JWT_SECRET: ${JWT_SECRET:-dev_secret_key_change_in_production}
