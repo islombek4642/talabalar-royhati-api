@@ -1,5 +1,15 @@
 import Link from 'next/link';
-import { GraduationCap, LogIn, UserPlus } from 'lucide-react';
+import { 
+  GraduationCap, 
+  LogIn, 
+  UserPlus, 
+  Shield, 
+  Zap, 
+  Users, 
+  BookOpen,
+  Award,
+  Clock
+} from 'lucide-react';
 
 export default function Home() {
   return (
@@ -62,55 +72,141 @@ export default function Home() {
         </div>
 
         {/* Features */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <GraduationCap className="w-6 h-6 text-indigo-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Shaxsiy Profil
-            </h3>
-            <p className="text-gray-600">
-              O'z ma'lumotlaringizni ko'ring va tahrirlang
+        <div className="mt-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Imkoniyatlar
+            </h2>
+            <p className="text-lg text-gray-600">
+              Talabalar uchun qulay va zamonaviy portal
             </p>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-indigo-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Shaxsiy Profil
+              </h3>
+              <p className="text-gray-600">
+                O'z ma'lumotlaringizni ko'ring va istalgan vaqt tahrirlang
+              </p>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Xavfsiz
-            </h3>
-            <p className="text-gray-600">
-              Ma'lumotlaringiz shifrlangan va xavfsiz
-            </p>
-          </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-lg">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Xavfsizlik
+              </h3>
+              <p className="text-gray-600">
+                Ma'lumotlaringiz shifrlangan va himoyalangan tizimda saqlanadi
+              </p>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Tez va Qulay
-            </h3>
-            <p className="text-gray-600">
-              Zamonaviy va foydalanish uchun qulay interfeys
-            </p>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Tez va Qulay
+              </h3>
+              <p className="text-gray-600">
+                Zamonaviy texnologiyalar bilan yaratilgan qulay interfeys
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <BookOpen className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                O'quv Ma'lumotlari
+              </h3>
+              <p className="text-gray-600">
+                Fakultet, guruh va o'qishga kirgan yil ma'lumotlari
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Profil Rasmingiz
+              </h3>
+              <p className="text-gray-600">
+                Shaxsiy profil rasmingizni yuklash va o'zgartirish imkoniyati
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-pink-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                24/7 Kirish
+              </h3>
+              <p className="text-gray-600">
+                Istalgan vaqt va istalgan joydan o'z profilingizga kiring
+              </p>
+            </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="mt-20 bg-white/80 backdrop-blur-sm border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-center text-gray-600">
-            © 2025 Talabalar Portali. Barcha huquqlar himoyalangan.
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Logo va About */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <GraduationCap className="w-6 h-6 text-indigo-600" />
+                <span className="text-lg font-bold text-gray-900">Talabalar Portali</span>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Zamonaviy va xavfsiz talabalar boshqaruv tizimi.
+                O'z profilingizni boshqaring va ma'lumotlaringizni yangilang.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Tezkor Havolalar</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/login" className="text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                    Tizimga Kirish
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/register" className="text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                    Ro'yhatdan O'tish
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Bog'lanish</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>Email: info@talabalar-portal.uz</li>
+                <li>Tel: +998 (90) 123-45-67</li>
+                <li>Manzil: Toshkent, O'zbekiston</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-gray-200">
+            <p className="text-center text-gray-600 text-sm">
+              © 2025 Talabalar Portali. Barcha huquqlar himoyalangan.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

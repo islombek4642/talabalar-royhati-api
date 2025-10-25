@@ -127,7 +127,7 @@ export default function ProfilePictureUpload({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif"
             onChange={handleFileSelect}
             className="hidden"
             id="picture-upload"
@@ -194,7 +194,7 @@ export default function ProfilePictureUpload({
           )}
 
           <p className="text-xs text-gray-500 mt-2">
-            JPG, PNG yoki WebP. Maksimal 5MB.
+            JPG, PNG, WebP yoki HEIC. Maksimal 10MB. Original sifatda saqlanadi.
           </p>
         </div>
       </div>

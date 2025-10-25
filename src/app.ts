@@ -39,6 +39,9 @@ app.use(
 app.use(apiLimiter); // Rate limiting
 app.use(express.json());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 app.get('/', (_req, res) => {
   res.json({ name: "Talabalar Ro'yhati API", version: '1.0.0', status: 'ok' });
 });

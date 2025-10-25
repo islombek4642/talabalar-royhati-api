@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, X } from 'lucide-react';
 import Link from 'next/link';
+import ProfilePictureUpload from '../../components/ProfilePictureUpload';
 
 const editProfileSchema = z.object({
   full_name: z.string().min(2, 'Ism kamida 2 ta harf bo\'lishi kerak'),
@@ -147,6 +148,22 @@ export default function ProfileEditPage() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Profile Picture */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profil Rasmi
+              </label>
+              <ProfilePictureUpload
+                currentPicture={student.profile_picture}
+                onUploadSuccess={(newPicture) => {
+                  loadFromStorage();
+                }}
+                onDeleteSuccess={() => {
+                  loadFromStorage();
+                }}
+              />
+            </div>
+
             {/* Full Name */}
             <div>
               <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">

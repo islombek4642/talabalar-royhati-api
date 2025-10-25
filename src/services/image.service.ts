@@ -4,8 +4,8 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads/profiles';
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_SIZE = 10 * 1024 * 1024; // 10MB (increased for high quality images)
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 
 // Ensure upload directory exists
 async function ensureUploadDir() {
@@ -33,19 +33,15 @@ export const imageService = {
 
     await ensureUploadDir();
 
-    // Generate unique filename
-    const filename = `${randomUUID()}.webp`;
+    // Save original file without any processing
+    // Keep the original format (JPG, PNG, WebP)
+    const ext = file.mimetype.split('/')[1] === 'jpeg' ? 'jpg' : file.mimetype.split('/')[1];
+    const filename = `${randomUUID()}.${ext}`;
     const filepath = path.join(UPLOAD_DIR, filename);
-
-    // Process image: resize, optimize, convert to WebP
-    await sharp(file.buffer)
-      .resize(400, 400, {
-        fit: 'cover',
-        position: 'center'
-      })
-      .webp({ quality: 85 })
-      .toFile(filepath);
-
+    
+    // Save original file as-is - NO PROCESSING!
+    await fs.writeFile(filepath, file.buffer);
+    
     // Return relative path
     return `/uploads/profiles/${filename}`;
   },
@@ -73,8 +69,11 @@ export const imageService = {
 
     // Process and return optimized image
     return await sharp(buffer)
-      .resize(400, 400, { fit: 'cover' })
-      .webp({ quality: 85 })
+      .resize(800, 800, { 
+        fit: 'cover',
+        withoutEnlargement: true
+      })
+      .webp({ quality: 90 })
       .toBuffer();
   }
 };

@@ -2,16 +2,16 @@ import { api } from './api';
 
 export const profilePictureService = {
   async upload(file: File): Promise<{ profile_picture: string }> {
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    // Validate file type (including HEIC for iPhone photos)
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
     if (!validTypes.includes(file.type)) {
-      throw new Error('Faqat JPG, PNG va WebP formatlariga ruxsat berilgan');
+      throw new Error('Faqat JPG, PNG, WebP va HEIC formatlariga ruxsat berilgan');
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (max 10MB for high quality)
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      throw new Error('Rasm hajmi 5MB dan oshmasligi kerak');
+      throw new Error('Rasm hajmi 10MB dan oshmasligi kerak');
     }
 
     const formData = new FormData();
