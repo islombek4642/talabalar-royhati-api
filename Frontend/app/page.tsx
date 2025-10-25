@@ -8,7 +8,11 @@ import {
   Users, 
   BookOpen,
   Award,
-  Clock
+  Clock,
+  Github,
+  Linkedin,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 export default function Home() {
@@ -159,53 +163,102 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-20 bg-white/80 backdrop-blur-sm border-t border-gray-200">
+      <footer className="mt-20 bg-gradient-to-br from-gray-900 to-indigo-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Logo va About */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <GraduationCap className="w-6 h-6 text-indigo-600" />
-                <span className="text-lg font-bold text-gray-900">Talabalar Portali</span>
+                <GraduationCap className="w-6 h-6 text-indigo-400" />
+                <span className="text-lg font-bold">Talabalar Portali</span>
               </div>
-              <p className="text-gray-600 text-sm">
-                Zamonaviy va xavfsiz talabalar boshqaruv tizimi.
-                O'z profilingizni boshqaring va ma'lumotlaringizni yangilang.
+              <p className="text-gray-300 text-sm mb-4">
+                Zamonaviy va xavfsiz talabalar boshqaruv tizimi. 
+                Next.js, TypeScript va PostgreSQL bilan ishlab chiqilgan.
               </p>
+              <div className="flex gap-3">
+                <a
+                  href="https://github.com/islombek4642"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-gray-800 hover:bg-indigo-600 rounded-lg flex items-center justify-center transition-colors"
+                >
+                  <Github className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/islombek-hamidullayev-481354288/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-gray-800 hover:bg-indigo-600 rounded-lg flex items-center justify-center transition-colors"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Tezkor Havolalar</h3>
+              <h3 className="font-semibold mb-4">Tezkor Havolalar</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/login" className="text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                  <Link href="/login" className="text-gray-300 hover:text-indigo-400 transition-colors text-sm flex items-center gap-2">
+                    <LogIn className="w-4 h-4" />
                     Tizimga Kirish
                   </Link>
                 </li>
                 <li>
-                  <Link href="/register" className="text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                  <Link href="/register" className="text-gray-300 hover:text-indigo-400 transition-colors text-sm flex items-center gap-2">
+                    <UserPlus className="w-4 h-4" />
                     Ro'yhatdan O'tish
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/login" className="text-gray-400 hover:text-purple-400 transition-colors text-xs flex items-center gap-2 mt-4">
+                    <Shield className="w-3 h-3" />
+                    Admin Panel
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Contact */}
+            {/* Developer */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Bog'lanish</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>Email: info@talabalar-portal.uz</li>
-                <li>Tel: +998 (90) 123-45-67</li>
-                <li>Manzil: Toshkent, O'zbekiston</li>
+              <h3 className="font-semibold mb-4">Dasturchi</h3>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="font-medium text-white">Islombek Xamidullayev</li>
+                <li className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  inamidullayev5@gmail.com
+                </li>
+                <li className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  +998 (90) 696-46-42
+                </li>
               </ul>
+            </div>
+
+            {/* Tech Stack */}
+            <div>
+              <h3 className="font-semibold mb-4">Texnologiyalar</h3>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">Next.js 16</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">TypeScript</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">PostgreSQL</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">Express.js</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">Prisma</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">Docker</span>
+                <span className="px-3 py-1 bg-gray-800 rounded-full text-xs">Tailwind CSS</span>
+              </div>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-gray-200">
-            <p className="text-center text-gray-600 text-sm">
-              © 2025 Talabalar Portali. Barcha huquqlar himoyalangan.
-            </p>
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-gray-700">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-gray-400 text-sm">
+                © 2025 Islombek Xamidullayev. Barcha huquqlar himoyalangan.
+              </p>
+            </div>
           </div>
         </div>
       </footer>
