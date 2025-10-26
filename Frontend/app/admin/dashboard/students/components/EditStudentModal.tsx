@@ -92,110 +92,132 @@ export default function EditStudentModal({ student, onClose, onUpdate }: Props) 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-full-name" className="block text-sm font-medium text-gray-700 mb-1">
                 To'liq Ism
               </label>
               <input
+                id="student-full-name"
+                name="full_name"
                 type="text"
                 value={formData.full_name}
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                required
+                autoComplete="name"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <input
+                id="student-email"
+                name="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
+                autoComplete="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-phone" className="block text-sm font-medium text-gray-700 mb-1">
                 Telefon
               </label>
               <input
-                type="text"
+                id="student-phone"
+                name="phone"
+                type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+998901234567"
+                autoComplete="tel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
             {/* Faculty */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-faculty" className="block text-sm font-medium text-gray-700 mb-1">
                 Fakultet
               </label>
               <input
+                id="student-faculty"
+                name="faculty"
                 type="text"
                 value={formData.faculty}
                 onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-                required
+                autoComplete="off"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Group */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-group" className="block text-sm font-medium text-gray-700 mb-1">
                 Guruh
               </label>
               <input
+                id="student-group"
+                name="group"
                 type="text"
                 value={formData.group}
                 onChange={(e) => setFormData({ ...formData, group: e.target.value })}
-                required
+                autoComplete="off"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Enrollment Year */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-enrollment-year" className="block text-sm font-medium text-gray-700 mb-1">
                 O'qishga Kirgan Yil
               </label>
               <input
+                id="student-enrollment-year"
+                name="enrollment_year"
                 type="number"
                 value={formData.enrollment_year}
                 onChange={(e) => setFormData({ ...formData, enrollment_year: Number(e.target.value) })}
-                required
+                autoComplete="off"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 min="2000"
                 max={new Date().getFullYear()}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Birth Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-birth-date" className="block text-sm font-medium text-gray-700 mb-1">
                 Tug'ilgan Sana
               </label>
               <input
+                id="student-birth-date"
+                name="birth_date"
                 type="date"
                 value={formData.birth_date}
                 onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                required
+                autoComplete="bday"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
             </div>
 
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="student-status" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
+                id="student-status"
+                name="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"

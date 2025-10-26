@@ -39,7 +39,43 @@ services:
       SWAGGER_PASSWORD: ${SWAGGER_PASSWORD:-swagger123}
       BACKUP_DIR: ${BACKUP_DIR:-/backups}
       ENABLE_METRICS: ${ENABLE_METRICS:-true}
+    volumes:
+      - uploads_data:/app/uploads
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: talabalar_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: talabalar_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
     restart: unless-stopped
 
 volumes:
   db_data:
+  uploads_data:
+  prometheus_data:
+  grafana_data:

@@ -10,7 +10,11 @@ import {
   LogOut,
   Menu,
   X,
-  Home
+  Home,
+  Settings,
+  Activity,
+  FileText,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function AdminDashboardLayout({
@@ -34,6 +38,18 @@ export default function AdminDashboardLayout({
     }
   }, [router]);
 
+  // ESC key to close sidebar
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [mobileMenuOpen]);
+
   const handleLogout = () => {
     if (confirm('Tizimdan chiqmoqchimisiz?')) {
       localStorage.removeItem('admin_token');
@@ -45,7 +61,11 @@ export default function AdminDashboardLayout({
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Talabalar', href: '/admin/dashboard/students', icon: Users },
+    { name: 'Adminlar', href: '/admin/dashboard/admins', icon: ShieldCheck },
     { name: 'Statistika', href: '/admin/dashboard/stats', icon: BarChart3 },
+    { name: 'Monitoring', href: '/admin/dashboard/monitoring', icon: Activity },
+    { name: 'API Docs', href: '/admin/dashboard/api-docs', icon: FileText },
+    { name: 'Sozlamalar', href: '/admin/dashboard/settings', icon: Settings },
   ];
 
   return (
@@ -63,6 +83,14 @@ export default function AdminDashboardLayout({
           )}
         </button>
       </div>
+
+      {/* Backdrop Overlay - Mobile only */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
@@ -95,6 +123,7 @@ export default function AdminDashboardLayout({
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                   ${isActive

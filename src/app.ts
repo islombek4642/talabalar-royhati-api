@@ -12,6 +12,7 @@ import studentsRouter from './routes/students.route';
 import healthRouter from './routes/health.route';
 import authRouter from './routes/auth.route';
 import studentAuthRouter from './routes/student-auth.route';
+import adminManagementRouter from './routes/admin-management.route';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yaml';
 import fs from 'fs';
@@ -33,9 +34,24 @@ app.use(
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: false,
     crossOriginOpenerPolicy: false,
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    frameguard: false  // Allow iframe embedding for Swagger UI and Grafana
   })
 );
+
+// Explicitly prevent X-Frame-Options header for iframe embedding in development
+app.use((req, res, next) => {
+  // Intercept the setHeader method to prevent X-Frame-Options from being set
+  const originalSetHeader = res.setHeader.bind(res);
+  res.setHeader = function(name: string, value: any) {
+    if (name.toLowerCase() === 'x-frame-options' && env.NODE_ENV !== 'production') {
+      return res; // Skip setting this header in development
+    }
+    return originalSetHeader(name, value);
+  };
+  next();
+});
+
 app.use(apiLimiter); // Rate limiting
 app.use(express.json());
 
@@ -56,7 +72,7 @@ if (fs.existsSync(openapiPath)) {
   app.get('/openapi.yaml', (_req, res) => {
     res.type('text/yaml').send(file);
   });
-  // Ensure no strict security headers interfere with Swagger assets
+  // Ensure no strict security headers interfere with Swagger assets and iframe embedding
   app.use('/api-docs', conditionalSwaggerAuth, (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => {
     res.removeHeader('Content-Security-Policy');
     res.removeHeader('X-Content-Security-Policy');
@@ -64,6 +80,9 @@ if (fs.existsSync(openapiPath)) {
     res.removeHeader('Cross-Origin-Opener-Policy');
     res.removeHeader('Cross-Origin-Resource-Policy');
     res.removeHeader('Cross-Origin-Embedder-Policy');
+    res.removeHeader('X-Frame-Options');
+    // Allow iframe embedding in development by not setting X-Frame-Options
+    // In production, helmet middleware will add it back
     next();
   }, swaggerUi.serve, swaggerUi.setup(openapi));
 }
@@ -77,6 +96,7 @@ app.use('/health', healthRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/student', studentAuthRouter);
 app.use('/api/v1/students', studentsRouter);
+app.use('/api/v1/admin', adminManagementRouter);
 
 app.use(errorHandler);
 

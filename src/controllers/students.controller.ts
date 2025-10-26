@@ -204,5 +204,161 @@ export const studentsController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  async bulkDelete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { ids } = req.body;
+      
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ 
+          error: { 
+            message: 'IDs array is required (e.g., {"ids": ["id1", "id2"]})', 
+            code: 'VALIDATION_ERROR' 
+          } 
+        });
+      }
+
+      const userId = (req as any).user?.sub;
+      const deleted = await studentsService.bulkDelete(ids, userId, req.ip, req.get('user-agent'));
+      
+      res.json({ 
+        message: `${deleted} students deleted successfully`,
+        count: deleted
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { confirm } = req.body;
+      
+      if (confirm !== 'DELETE_ALL_STUDENTS') {
+        return res.status(400).json({ 
+          error: { 
+            message: 'Confirmation required: {"confirm": "DELETE_ALL_STUDENTS"}', 
+            code: 'CONFIRMATION_REQUIRED' 
+          } 
+        });
+      }
+
+      const userId = (req as any).user?.sub;
+      const deleted = await studentsService.deleteAll(userId, req.ip, req.get('user-agent'));
+      
+      res.json({ 
+        message: `All ${deleted} students deleted successfully`,
+        count: deleted
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async permanentDeleteAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { confirm } = req.body;
+      
+      if (confirm !== 'PERMANENT_DELETE_ALL_STUDENTS') {
+        return res.status(400).json({ 
+          error: { 
+            message: 'Confirmation required: {"confirm": "PERMANENT_DELETE_ALL_STUDENTS"}', 
+            code: 'CONFIRMATION_REQUIRED' 
+          } 
+        });
+      }
+
+      const userId = (req as any).user?.sub;
+      const deleted = await studentsService.permanentDeleteAll(userId, req.ip, req.get('user-agent'));
+      
+      res.json({ 
+        message: `⚠️ Permanently deleted ${deleted} students from database`,
+        count: deleted,
+        permanent: true
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async restore(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user?.sub;
+      
+      const student = await studentsService.restore(id, userId);
+      
+      res.json({ 
+        message: 'Student restored successfully',
+        student
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getDeleted(req: Request, res: Response, next: NextFunction) {
+    try {
+      const students = await studentsService.getDeleted();
+      
+      res.json({ 
+        students,
+        count: students.length,
+        retention_days: 30  // Soft deleted students are kept for 30 days
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async bulkRestore(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { ids } = req.body;
+      
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ 
+          error: { 
+            message: 'IDs array is required (e.g., {"ids": ["id1", "id2"]})', 
+            code: 'VALIDATION_ERROR' 
+          } 
+        });
+      }
+
+      const userId = (req as any).user?.sub;
+      const restored = await studentsService.bulkRestore(ids, userId);
+      
+      res.json({ 
+        message: `${restored} students restored successfully`,
+        count: restored
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async restoreAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { confirm } = req.body;
+      
+      if (confirm !== 'RESTORE_ALL_STUDENTS') {
+        return res.status(400).json({ 
+          error: { 
+            message: 'Confirmation required: {"confirm": "RESTORE_ALL_STUDENTS"}', 
+            code: 'CONFIRMATION_REQUIRED' 
+          } 
+        });
+      }
+
+      const userId = (req as any).user?.sub;
+      const restored = await studentsService.restoreAll(userId);
+      
+      res.json({ 
+        message: `All ${restored} students restored successfully`,
+        count: restored
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 };

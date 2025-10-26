@@ -171,12 +171,13 @@ export default function AdminDashboardPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">Fakultetlar</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {stats.faculties.map((faculty) => (
-            <div
+            <Link
               key={faculty}
-              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors"
+              href={`/admin/dashboard/students?faculty=${encodeURIComponent(faculty)}`}
+              className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors cursor-pointer group"
             >
-              <p className="font-medium text-gray-900 text-center">{faculty}</p>
-            </div>
+              <p className="font-medium text-gray-900 text-center group-hover:text-purple-600 transition-colors">{faculty}</p>
+            </Link>
           ))}
         </div>
       </div>

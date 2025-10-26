@@ -17,16 +17,35 @@ export const studentsRepo = {
       } 
     });
   },
-  findByEmails(emails: string[]) {
+  findByEmails(emails: string[], includeDeleted = false) {
     return prisma.student.findMany({
       where: {
         email: { in: emails },
-        deleted_at: null
+        ...(includeDeleted ? {} : { deleted_at: null })
       },
       select: {
         id: true,
         email: true,
-        full_name: true
+        full_name: true,
+        deleted_at: true
+      }
+    });
+  },
+  findAll(options?: { deleted?: boolean | undefined }) {
+    let where: any = {};
+    if (options?.deleted === false) {
+      where = { deleted_at: null }; // Only active students
+    } else if (options?.deleted === true) {
+      where = { deleted_at: { not: null } }; // Only deleted students
+    }
+    // else: options?.deleted === undefined → {} (all students)
+    
+    return prisma.student.findMany({
+      where,
+      select: {
+        id: true,
+        full_name: true,
+        email: true
       }
     });
   },
@@ -128,11 +147,21 @@ export const studentsRepo = {
   },
   
   // Get deleted students (admin only)
-  async getDeleted(limit = 50) {
+  async getDeleted(limit = 10000) {
     return prisma.student.findMany({
       where: { deleted_at: { not: null } },
       orderBy: { deleted_at: 'desc' },
-      take: limit
+      take: limit,
+      select: {
+        id: true,
+        full_name: true,
+        email: true,
+        phone: true,
+        faculty: true,
+        group: true,
+        enrollment_year: true,
+        deleted_at: true
+      }
     });
   }
 };

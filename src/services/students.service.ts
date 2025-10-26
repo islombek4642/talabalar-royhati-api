@@ -49,9 +49,17 @@ export const studentsService = {
     return updated;
   },
   async delete(id: string, userId?: string, ipAddress?: string, userAgent?: string) {
-    const deleted = await studentsRepo.delete(id);
+    const student = await studentsRepo.findById(id, true); // Include deleted to check status
+    if (!student) {
+      throw new Error('Student not found');
+    }
     
-    // Audit log
+    // Check if already soft-deleted
+    if ((student as any).deleted_at) {
+      console.log(`[Delete] Student ${id} already soft-deleted, skipping`);
+      return student; // Already deleted, return as-is
+    }
+    
     await auditService.log({
       entityType: 'Student',
       entityId: id,
@@ -61,10 +69,27 @@ export const studentsService = {
       userAgent
     });
     
-    return deleted;
+    return studentsRepo.update(id, { deleted_at: new Date() });
   },
   async restore(id: string, userId?: string) {
     return studentsRepo.restore(id, userId);
+  },
+  async bulkRestore(ids: string[], userId?: string) {
+    let restored = 0;
+    for (const id of ids) {
+      try {
+        await studentsRepo.restore(id, userId);
+        restored++;
+      } catch (error) {
+        console.error(`Failed to restore student ${id}:`, error);
+      }
+    }
+    return restored;
+  },
+  async restoreAll(userId?: string) {
+    const deletedStudents = await studentsRepo.getDeleted();
+    const ids = deletedStudents.map((s: any) => s.id);
+    return this.bulkRestore(ids, userId);
   },
   async getDeleted() {
     return studentsRepo.getDeleted();
@@ -117,11 +142,15 @@ export const studentsService = {
   },
   async importCsv(buf: Buffer) {
     const text = buf.toString('utf-8');
+    console.log('[Import] CSV text length:', text.length);
     const records = parse(text, {
       columns: true,
       skip_empty_lines: true,
       trim: true
     }) as any[];
+    console.log('[Import] Parsed records count:', records.length);
+    console.log('[Import] First record:', records[0]);
+    
     const valid: any[] = [];
     const errors: Array<{ row: number; message: string }> = [];
     const emailsToCheck: string[] = [];
@@ -143,6 +172,7 @@ export const studentsService = {
         enrollment_year: Number(input.enrollment_year)
       });
       if (!parsed.success) {
+        console.log(`[Import] Row ${idx + 1} validation failed:`, parsed.error.errors);
         errors.push({ row: idx + 1, message: parsed.error.errors.map(e => e.message).join('; ') });
       } else {
         const data = parsed.data as any;
@@ -156,16 +186,66 @@ export const studentsService = {
       }
     });
     
+    console.log('[Import] Valid records:', valid.length);
+    console.log('[Import] Invalid records:', errors.length);
+    console.log('[Import] Emails to check:', emailsToCheck.length);
+    
     // Check for existing students by email
     const duplicates: any[] = [];
     if (emailsToCheck.length > 0) {
-      const existing = await studentsRepo.findByEmails(emailsToCheck);
-      const existingEmails = new Set(existing.map((s: any) => s.email).filter(Boolean));
+      // First check active students
+      const activeStudents = await studentsRepo.findByEmails(emailsToCheck, false);
+      const activeEmails = new Set(activeStudents.map((s: any) => s.email).filter(Boolean));
       
-      // Separate duplicates and new students
-      // Only check duplicates for students with email
-      const toInsert = valid.filter(s => !s.email || !existingEmails.has(s.email));
-      const duplicateStudents = valid.filter(s => s.email && existingEmails.has(s.email));
+      // Then check soft-deleted students (we'll restore these)
+      const deletedStudents = await studentsRepo.findByEmails(emailsToCheck, true);
+      const deletedByEmail = new Map(
+        deletedStudents
+          .filter((s: any) => s.deleted_at !== null)
+          .map((s: any) => [s.email, s])
+      );
+      
+      console.log('[Import] Active students found:', activeStudents.length);
+      console.log('[Import] Soft-deleted students found:', deletedByEmail.size);
+      
+      // Track which emails we've already seen to insert only first occurrence
+      const emailsSeen = new Map<string, boolean>(); // email -> inserted?
+      
+      const toInsert: any[] = [];
+      const duplicateStudents: any[] = [];
+      
+      const toRestore: any[] = []; // Soft-deleted students to restore
+      
+      valid.forEach(s => {
+        if (!s.email) {
+          // No email - always insert
+          toInsert.push(s);
+        } else if (activeEmails.has(s.email)) {
+          // Email in active students - duplicate
+          duplicateStudents.push(s);
+        } else if (emailsSeen.has(s.email)) {
+          // Email already seen in this CSV - duplicate
+          duplicateStudents.push(s);
+        } else if (deletedByEmail.has(s.email)) {
+          // Email in soft-deleted student - restore and update
+          const deleted = deletedByEmail.get(s.email) as any;
+          if (deleted) {
+            toRestore.push({
+              id: deleted.id,
+              data: {
+                ...s,
+                deleted_at: null, // Restore
+                updated_at: new Date()
+              }
+            });
+            emailsSeen.set(s.email, true);
+          }
+        } else {
+          // First time seeing this email - insert it
+          emailsSeen.set(s.email, true);
+          toInsert.push(s);
+        }
+      });
       
       duplicateStudents.forEach(s => {
         duplicates.push({
@@ -173,6 +253,21 @@ export const studentsService = {
           full_name: s.full_name
         });
       });
+      
+      // Restore soft-deleted students
+      let restored = 0;
+      if (toRestore.length) {
+        console.log(`[Import] Restoring ${toRestore.length} soft-deleted students`);
+        for (const item of toRestore) {
+          try {
+            await studentsRepo.update(item.id, item.data);
+            restored++;
+          } catch (error) {
+            console.error(`[Import] Failed to restore student ${item.id}:`, error);
+          }
+        }
+        console.log(`[Import] Restored ${restored} students`);
+      }
       
       // Insert only new students
       let inserted = 0;
@@ -189,11 +284,12 @@ export const studentsService = {
           console.error('[Import] Error details:', JSON.stringify(error));
         }
       } else {
-        console.log('[Import] No new students to insert (all duplicates)');
+        console.log('[Import] No new students to insert');
       }
       
       return { 
-        inserted, 
+        inserted: inserted + restored, // Total new records (insert + restore)
+        restored, // Number of soft-deleted students restored
         invalid: errors.length, 
         duplicates: duplicates.length,
         duplicateList: duplicates,
@@ -209,6 +305,72 @@ export const studentsService = {
       inserted = (result as any).count ?? 0;
       console.log(`[Import] Inserted count: ${inserted}`);
     }
-    return { inserted, invalid: errors.length, duplicates: 0, duplicateList: [], errors };
+    return { inserted, restored: 0, invalid: errors.length, duplicates: 0, duplicateList: [], errors };
+  },
+
+  async bulkDelete(ids: string[], userId?: string, ipAddress?: string, userAgent?: string) {
+    let deleted = 0;
+    
+    for (const id of ids) {
+      try {
+        await this.delete(id, userId, ipAddress, userAgent);
+        deleted++;
+      } catch (error) {
+        console.error(`Failed to delete student ${id}:`, error);
+        // Continue with other deletions
+      }
+    }
+    
+    return deleted;
+  },
+
+  async deleteAll(userId?: string, ipAddress?: string, userAgent?: string) {
+    // Get ONLY ACTIVE students (not already soft-deleted)
+    const allStudents = await studentsRepo.findAll({ deleted: false });
+    console.log('[Delete All] Active students found:', allStudents.length);
+    
+    if (allStudents.length === 0) {
+      console.log('[Delete All] No active students to delete');
+      return 0;
+    }
+    
+    const ids = allStudents.map((s: any) => s.id);
+    return this.bulkDelete(ids, userId, ipAddress, userAgent);
+  },
+
+  async permanentDeleteAll(userId?: string, ipAddress?: string, userAgent?: string) {
+    // ⚠️ HARD DELETE - Bazadan butunlay o'chiradi!
+    const allStudents = await studentsRepo.findAll({ deleted: undefined }); // ALL students
+    console.log('[Permanent Delete] Total students to delete:', allStudents.length);
+    
+    if (allStudents.length === 0) {
+      console.log('[Permanent Delete] No students found');
+      return 0;
+    }
+
+    // Audit log BEFORE deleting
+    await auditService.log({
+      entityType: 'Student',
+      entityId: 'ALL',
+      action: 'DELETE',
+      userId,
+      changes: { count: allStudents.length, permanent: true },
+      ipAddress,
+      userAgent
+    });
+
+    // HARD DELETE from database
+    let deleted = 0;
+    for (const student of allStudents) {
+      try {
+        await studentsRepo.hardDelete(student.id);
+        deleted++;
+      } catch (error) {
+        console.error(`[Permanent Delete] Failed to delete ${student.id}:`, error);
+      }
+    }
+
+    console.log(`[Permanent Delete] Deleted ${deleted} students from database`);
+    return deleted;
   }
 };

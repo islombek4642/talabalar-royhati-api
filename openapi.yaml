@@ -46,6 +46,105 @@ paths:
       responses:
         '201':
           description: Created
+  /api/v1/students/deleted:
+    get:
+      summary: Get soft-deleted students
+      description: Retrieve all students that have been soft-deleted (within 30-day retention period)
+      tags:
+        - Students
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of deleted students
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  students:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Student'
+                  count:
+                    type: integer
+                  retention_days:
+                    type: integer
+                    description: Days until permanent deletion
+        '401':
+          description: Unauthorized
+  /api/v1/students/bulk-restore:
+    post:
+      summary: Bulk restore deleted students
+      description: Restore multiple soft-deleted students at once
+      tags:
+        - Students
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of student IDs to restore
+      responses:
+        '200':
+          description: Students restored successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  count:
+                    type: integer
+        '401':
+          description: Unauthorized
+  /api/v1/students/bulk-permanent-delete:
+    delete:
+      summary: Permanently delete multiple students
+      description: Permanently delete multiple soft-deleted students (cannot be undone)
+      tags:
+        - Students
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of student IDs to permanently delete
+      responses:
+        '200':
+          description: Students permanently deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  count:
+                    type: integer
+        '401':
+          description: Unauthorized
   /api/v1/students/export.csv:
     get:
       summary: Export students as CSV
@@ -194,6 +293,37 @@ paths:
                 type: object
                 properties:
                   message: { type: string }
+  /api/v1/students/{id}/restore:
+    post:
+      summary: Restore soft-deleted student
+      description: Restore a single soft-deleted student
+      tags:
+        - Students
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Student ID
+      responses:
+        '200':
+          description: Student restored successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  student:
+                    $ref: '#/components/schemas/Student'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Student not found
   /api/v1/auth/login:
     post:
       summary: Admin login
@@ -219,6 +349,145 @@ paths:
                 properties:
                   access_token: { type: string }
                   token_type: { type: string, example: Bearer }
+  /api/v1/auth/change-password:
+    post:
+      summary: Change admin password
+      description: Change the password for the currently authenticated admin
+      tags:
+        - Admin Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password
+                  example: "admin123"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  description: New password (minimum 6 characters)
+                  example: "newpassword123"
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password changed successfully"
+        '400':
+          description: Validation error
+        '401':
+          description: Current password incorrect or unauthorized
+  /api/v1/auth/profile:
+    get:
+      summary: Get admin profile
+      description: Get the profile information of the currently authenticated admin
+      tags:
+        - Admin Auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Admin profile information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  full_name:
+                    type: string
+                  phone:
+                    type: string
+                  is_active:
+                    type: boolean
+                  last_login_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+        '401':
+          description: Unauthorized
+        '404':
+          description: Admin not found
+    patch:
+      summary: Update admin profile
+      description: Update the profile information of the currently authenticated admin
+      tags:
+        - Admin Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                  description: Full name of the admin
+                  example: "Adminov Admin"
+                email:
+                  type: string
+                  format: email
+                  description: Email address
+                  example: "admin@example.com"
+                phone:
+                  type: string
+                  description: Phone number
+                  example: "+998901234567"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profile updated successfully"
+                  admin:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      full_name:
+                        type: string
+                      phone:
+                        type: string
+                      is_active:
+                        type: boolean
+        '400':
+          description: Validation error or email already in use
+        '401':
+          description: Unauthorized
+        '404':
+          description: Admin not found
   /api/v1/student/register:
     post:
       summary: Student registration

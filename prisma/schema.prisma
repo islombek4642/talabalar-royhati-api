@@ -45,6 +45,23 @@ model User {
   @@index([student_id])
 }
 
+model Admin {
+  id              String    @id @default(uuid())
+  username        String    @unique
+  email           String?   @unique
+  password        String    // Hashed password (bcrypt)
+  full_name       String?
+  phone           String?
+  role            AdminRole @default(ADMIN)
+  is_active       Boolean   @default(true)
+  last_login_at   DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  @@index([username])
+  @@index([role])
+}
+
 model AuditLog {
   id          String   @id @default(uuid())
   entity_type String   // e.g., "Student"
@@ -69,4 +86,9 @@ enum Status {
 enum Role {
   ADMIN
   STUDENT
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
 }

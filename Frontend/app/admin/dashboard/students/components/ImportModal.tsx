@@ -40,6 +40,15 @@ export default function ImportModal({ onClose, onSuccess }: Props) {
 
     try {
       const token = localStorage.getItem('admin_token');
+      
+      if (!token) {
+        setError('Token topilmadi. Qayta login qiling.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('[Import] Starting import...', { fileName: file.name, fileSize: file.size });
+      
       const formData = new FormData();
       formData.append('file', file);
 
@@ -51,15 +60,24 @@ export default function ImportModal({ onClose, onSuccess }: Props) {
         body: formData
       });
 
+      console.log('[Import] Response status:', response.status);
+
       if (!response.ok) {
         const data = await response.json();
+        console.error('[Import] Error response:', data);
         throw new Error(data.error?.message || 'Import failed');
       }
 
       const result = await response.json();
-      console.log('Import result:', result); // Debug log
+      console.log('[Import] Success result:', result);
       
-      const message = `✅ ${result.inserted || 0} ta talaba import qilindi!`;
+      const insertedCount = (result.inserted || 0) - (result.restored || 0);
+      const restoredCount = result.restored || 0;
+      
+      let message = `✅ ${result.inserted || 0} ta talaba import qilindi!`;
+      if (restoredCount > 0) {
+        message = `✅ ${insertedCount} ta yangi + ${restoredCount} ta qayta tiklandi = ${result.inserted} ta talaba!`;
+      }
       const invalidMsg = result.invalid > 0 ? ` (${result.invalid} ta xato)` : '';
       const duplicateMsg = result.duplicates > 0 ? ` ${result.duplicates} ta dublikat topildi` : '';
       setSuccess(message + invalidMsg + duplicateMsg);
@@ -141,6 +159,8 @@ export default function ImportModal({ onClose, onSuccess }: Props) {
           {/* File Upload */}
           <div className="space-y-2">
             <input
+              id="csv-file-upload"
+              name="csv_file"
               ref={fileInputRef}
               type="file"
               accept=".csv"
