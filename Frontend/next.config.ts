@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Docker support - standalone output
+  output: 'standalone',
   // Note: Cross-origin and multiple lockfiles warnings are harmless
   // They only appear in development and don't affect functionality
 };

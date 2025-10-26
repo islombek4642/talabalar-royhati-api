@@ -3,6 +3,17 @@ import { auditService } from './audit.service';
 import { calcSkipTake } from '../utils/pagination';
 import { parse } from 'csv-parse/sync';
 import { createStudentSchema } from '../schemas/student.schema';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// Helper function to check if email belongs to an admin
+async function isAdminEmail(email: string): Promise<boolean> {
+  const admin = await prisma.admin.findUnique({
+    where: { email }
+  });
+  return admin !== null && admin.is_active;
+}
 
 export const studentsService = {
   async create(payload: any, userId?: string, ipAddress?: string, userAgent?: string) {
@@ -52,6 +63,15 @@ export const studentsService = {
     const student = await studentsRepo.findById(id, true); // Include deleted to check status
     if (!student) {
       throw new Error('Student not found');
+    }
+    
+    // 🔒 PROTECTION: Cannot delete admins!
+    if (student.email) {
+      const isAdmin = await isAdminEmail(student.email);
+      if (isAdmin) {
+        console.log(`[Delete] BLOCKED: Cannot delete admin account: ${student.email}`);
+        throw new Error(`Cannot delete student with admin account (${student.email}). Remove admin role first.`);
+      }
     }
     
     // Check if already soft-deleted
@@ -334,8 +354,30 @@ export const studentsService = {
       return 0;
     }
     
-    const ids = allStudents.map((s: any) => s.id);
-    return this.bulkDelete(ids, userId, ipAddress, userAgent);
+    // 🔒 PROTECTION: Filter out admin accounts
+    const safeToDeleteIds: string[] = [];
+    let protectedCount = 0;
+    
+    for (const student of allStudents) {
+      if (student.email) {
+        const isAdmin = await isAdminEmail(student.email);
+        if (isAdmin) {
+          console.log(`[Delete All] PROTECTED: Skipping admin ${student.email}`);
+          protectedCount++;
+          continue;
+        }
+      }
+      safeToDeleteIds.push(student.id);
+    }
+    
+    console.log(`[Delete All] Protected admins: ${protectedCount}, Safe to delete: ${safeToDeleteIds.length}`);
+    
+    if (safeToDeleteIds.length === 0) {
+      console.log('[Delete All] No non-admin students to delete');
+      return 0;
+    }
+    
+    return this.bulkDelete(safeToDeleteIds, userId, ipAddress, userAgent);
   },
 
   async permanentDeleteAll(userId?: string, ipAddress?: string, userAgent?: string) {
@@ -348,20 +390,43 @@ export const studentsService = {
       return 0;
     }
 
+    // 🔒 PROTECTION: Filter out admin accounts
+    const safeToDeleteStudents = [];
+    let protectedCount = 0;
+    
+    for (const student of allStudents) {
+      if (student.email) {
+        const isAdmin = await isAdminEmail(student.email);
+        if (isAdmin) {
+          console.log(`[Permanent Delete] PROTECTED: Skipping admin ${student.email}`);
+          protectedCount++;
+          continue;
+        }
+      }
+      safeToDeleteStudents.push(student);
+    }
+    
+    console.log(`[Permanent Delete] Protected admins: ${protectedCount}, Safe to delete: ${safeToDeleteStudents.length}`);
+    
+    if (safeToDeleteStudents.length === 0) {
+      console.log('[Permanent Delete] No non-admin students to delete');
+      return 0;
+    }
+
     // Audit log BEFORE deleting
     await auditService.log({
       entityType: 'Student',
       entityId: 'ALL',
       action: 'DELETE',
       userId,
-      changes: { count: allStudents.length, permanent: true },
+      changes: { count: safeToDeleteStudents.length, permanent: true, protectedAdmins: protectedCount },
       ipAddress,
       userAgent
     });
 
     // HARD DELETE from database
     let deleted = 0;
-    for (const student of allStudents) {
+    for (const student of safeToDeleteStudents) {
       try {
         await studentsRepo.hardDelete(student.id);
         deleted++;
@@ -370,7 +435,7 @@ export const studentsService = {
       }
     }
 
-    console.log(`[Permanent Delete] Deleted ${deleted} students from database`);
+    console.log(`[Permanent Delete] Deleted ${deleted} students from database (${protectedCount} admins protected)`);
     return deleted;
   }
 };

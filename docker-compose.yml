@@ -43,6 +43,20 @@ services:
       - uploads_data:/app/uploads
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: talabalar_frontend
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:3000
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
     container_name: talabalar_prometheus

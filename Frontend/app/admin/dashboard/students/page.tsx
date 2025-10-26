@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Edit, Trash2, UserPlus, Download, Upload, RefreshCw, Shield, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ interface Student {
   status: string;
 }
 
-export default function StudentsListPage() {
+function StudentsListPageContent() {
   const searchParams = useSearchParams();
   const facultyFromUrl = searchParams.get('faculty') || '';
   
@@ -742,5 +742,21 @@ export default function StudentsListPage() {
         isDangerous={confirmModal.isDangerous}
       />
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function StudentsListPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yuklanmoqda...</p>
+        </div>
+      </div>
+    }>
+      <StudentsListPageContent />
+    </Suspense>
   );
 }
